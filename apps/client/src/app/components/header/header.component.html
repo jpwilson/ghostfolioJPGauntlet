@@ -78,6 +78,14 @@
       <li class="list-inline-item">
         <a
           class="d-none d-sm-block"
+          mat-flat-button
+          href="/api/v1/agent/ui"
+          >Agent</a
+        >
+      </li>
+      <li class="list-inline-item">
+        <a
+          class="d-none d-sm-block"
           i18n
           mat-flat-button
           [ngClass]="{
@@ -266,6 +274,11 @@
             }"
             [routerLink]="routerLinkAccounts"
             >Accounts</a
+          >
+          <a
+            mat-menu-item
+            href="/api/v1/agent/ui"
+            >Agent</a
           >
           <a
             i18n
