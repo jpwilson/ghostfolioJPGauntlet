@@ -118,6 +118,11 @@ export const internalRoutes: Record<string, InternalRoute> = {
     routerLink: ['/i18n'],
     title: $localize`Internationalization`
   },
+  report: {
+    path: 'report',
+    routerLink: ['/report'],
+    title: $localize`Report`
+  },
   portfolio: {
     path: 'portfolio',
     routerLink: ['/portfolio'],

@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="report-header mb-4 mt-4">
+        <h1 class="mb-2">{{ reportTitle }}</h1>
+        <p class="text-muted" i18n>
+          Agent-generated reports and portfolio analysis will appear here.
+        </p>
+      </div>
+
+      <div class="report-content mb-4">
+        @if (reportContent) {
+          <div class="report-body" [innerHTML]="reportContent"></div>
+        } @else {
+          <div class="empty-state text-center py-5">
+            <div class="empty-icon mb-3">
+              <ion-icon name="document-text-outline" size="large"></ion-icon>
+            </div>
+            <h3 i18n>No Report Generated Yet</h3>
+            <p class="text-muted" i18n>
+              Ask the Agent to generate a custom report for your portfolio.
+            </p>
+          </div>
+        }
+      </div>
+
+      <div class="report-actions d-flex gap-3">
+        <a
+          mat-flat-button
+          color="primary"
+          href="/api/v1/agent/ui"
+          i18n
+        >Back to Agent</a>
+        <a
+          mat-stroked-button
+          [routerLink]="routerLinkHome"
+          i18n
+        >Back to Overview</a>
+      </div>
+    </div>
+  </div>
+</div>

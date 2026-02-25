@@ -1,0 +1,44 @@
+name: Agent Eval Check
+
+on:
+  pull_request:
+    branches: [main, feature/agent-mvp]
+    paths:
+      - 'apps/api/src/app/agent/**'
+      - '.github/workflows/agent-eval.yml'
+  push:
+    branches: [main, feature/agent-mvp]
+    paths:
+      - 'apps/api/src/app/agent/**'
+      - '.github/workflows/agent-eval.yml'
+
+jobs:
+  eval-check:
+    name: Deterministic Agent Eval
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for snapshot file
+        id: check-snapshot
+        run: |
+          if [ -f "apps/api/src/app/agent/eval-snapshots.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "::warning::No eval-snapshots.json found. Run 'AGENT_EVAL_TOKEN=<jwt> npm run eval:snapshot' to generate."
+          fi
+
+      - name: Run deterministic eval checks
+        if: steps.check-snapshot.outputs.exists == 'true'
+        run: npm run eval:check

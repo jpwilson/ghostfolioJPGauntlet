@@ -1,0 +1,39 @@
+:host {
+  display: block;
+
+  .report-header {
+    border-bottom: 1px solid rgba(var(--palette-foreground-divider), 0.12);
+    padding-bottom: 1rem;
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+  }
+
+  .empty-state {
+    background: rgba(var(--palette-foreground-base), 0.02);
+    border: 1px dashed rgba(var(--palette-foreground-divider), 0.2);
+    border-radius: 8px;
+    padding: 3rem;
+
+    ion-icon {
+      font-size: 3rem;
+      color: #36cfb4;
+    }
+
+    h3 {
+      font-weight: 500;
+    }
+  }
+
+  .report-body {
+    background: rgba(var(--palette-foreground-base), 0.02);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .report-actions {
+    gap: 0.75rem;
+  }
+}

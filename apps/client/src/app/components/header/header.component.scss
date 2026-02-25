@@ -23,6 +23,14 @@
       margin: 0;
     }
 
+    .agent-nav-link {
+      background: rgba(54, 207, 180, 0.12) !important;
+      color: #36cfb4 !important;
+      border-radius: 6px;
+      font-weight: 600 !important;
+      text-shadow: 0 0 8px rgba(54, 207, 180, 0.3);
+    }
+
     .mdc-button {
       height: 100%;
 

@@ -4,3 +4,9 @@ npm run affected:lint --base=main --head=HEAD --parallel=2 --quiet || exit 1
 
 # Check formatting on modified and uncommitted files, stop the commit if issues are found
 npm run format:check --uncommitted || exit 1
+
+# Run deterministic agent golden set checks against saved snapshots
+# No LLM calls - pure string matching, runs in milliseconds
+if [ -f "apps/api/src/app/agent/eval-snapshots.json" ]; then
+  npm run eval:check || exit 1
+fi
