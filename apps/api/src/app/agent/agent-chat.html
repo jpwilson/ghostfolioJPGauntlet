@@ -8,31 +8,37 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #1a1a2e;
+      background: #0c0c0c;
       color: #e0e0e0;
       height: 100vh;
       display: flex;
       flex-direction: column;
     }
     header {
-      background: #16213e;
-      padding: 16px 24px;
-      border-bottom: 1px solid #2a2a4a;
+      background: #111111;
+      padding: 12px 24px;
+      border-bottom: 1px solid #2a2a2a;
       display: flex;
       align-items: center;
       gap: 12px;
     }
+    .logo-video {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
     header a.back {
-      color: #a78bfa;
+      color: #36cfb4;
       text-decoration: none;
       font-size: 14px;
       padding: 6px 14px;
       border-radius: 6px;
-      border: 1px solid #2a2a4a;
+      border: 1px solid #2a2a2a;
       transition: background 0.2s;
     }
-    header a.back:hover { background: #222244; }
-    header h1 { font-size: 18px; font-weight: 600; }
+    header a.back:hover { background: #1a1a1a; }
+    header h1 { font-size: 18px; font-weight: 600; color: #ffffff; }
     header span { font-size: 12px; color: #888; }
     .header-actions {
       margin-left: auto;
@@ -43,16 +49,16 @@
     .header-actions button {
       padding: 6px 14px;
       font-size: 12px;
-      background: #222244;
-      border: 1px solid #2a2a4a;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       color: #e0e0e0;
       border-radius: 6px;
       cursor: pointer;
     }
-    .header-actions button:hover { background: #2a2a5a; }
+    .header-actions button:hover { background: #252525; }
     .status {
       font-size: 12px;
-      color: #4ade80;
+      color: #36cfb4;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -61,7 +67,7 @@
       content: '';
       width: 8px;
       height: 8px;
-      background: #4ade80;
+      background: #36cfb4;
       border-radius: 50%;
       display: inline-block;
     }
@@ -70,8 +76,8 @@
     .main-content { display: flex; flex: 1; overflow: hidden; }
     #sidebar {
       width: 260px;
-      background: #16213e;
-      border-right: 1px solid #2a2a4a;
+      background: #111111;
+      border-right: 1px solid #2a2a2a;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -79,20 +85,22 @@
     #sidebar h3 {
       padding: 12px 16px;
       font-size: 13px;
-      color: #888;
-      border-bottom: 1px solid #2a2a4a;
+      color: #36cfb4;
+      border-bottom: 1px solid #2a2a2a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .conv-item {
       padding: 10px 16px;
       cursor: pointer;
-      border-bottom: 1px solid #1a1a2e;
+      border-bottom: 1px solid #1a1a1a;
       font-size: 13px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .conv-item:hover { background: #222244; }
-    .conv-item.active { background: #0f3460; }
+    .conv-item:hover { background: #1a1a1a; }
+    .conv-item.active { background: #1a2a2a; border-left: 3px solid #36cfb4; }
     .conv-item .conv-date { font-size: 10px; color: #666; margin-top: 2px; }
     .conv-item .conv-delete {
       float: right;
@@ -121,12 +129,14 @@
     }
     .message.user {
       align-self: flex-end;
-      background: #0f3460;
+      background: #1a3a35;
+      border: 1px solid #2a5a4a;
       border-bottom-right-radius: 4px;
     }
     .message.assistant {
       align-self: flex-start;
-      background: #222244;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       border-bottom-left-radius: 4px;
     }
     .message.assistant .tool-calls {
@@ -137,12 +147,12 @@
       color: #888;
     }
     .message.assistant .tool-calls span {
-      background: #1a1a3e;
+      background: #0a1a18;
       padding: 2px 8px;
       border-radius: 4px;
       margin-right: 4px;
       font-family: monospace;
-      color: #a78bfa;
+      color: #36cfb4;
     }
     .verification {
       margin-top: 6px;
@@ -150,7 +160,7 @@
       border-top: 1px solid #333;
       font-size: 11px;
     }
-    .verification.pass { color: #4ade80; }
+    .verification.pass { color: #36cfb4; }
     .verification.fail { color: #f87171; }
     .message.error {
       align-self: center;
@@ -160,7 +170,7 @@
     }
     .typing {
       align-self: flex-start;
-      color: #888;
+      color: #36cfb4;
       font-size: 13px;
       padding: 8px 16px;
     }
@@ -175,8 +185,8 @@
     }
     #input-area {
       padding: 16px 24px;
-      background: #16213e;
-      border-top: 1px solid #2a2a4a;
+      background: #111111;
+      border-top: 1px solid #2a2a2a;
       display: flex;
       gap: 12px;
     }
@@ -184,26 +194,27 @@
       flex: 1;
       padding: 12px 16px;
       border-radius: 8px;
-      border: 1px solid #2a2a4a;
-      background: #1a1a2e;
+      border: 1px solid #2a2a2a;
+      background: #0c0c0c;
       color: #e0e0e0;
       font-size: 14px;
       outline: none;
       font-family: inherit;
     }
-    #input:focus { border-color: #4a4a8a; }
+    #input:focus { border-color: #36cfb4; }
     #input::placeholder { color: #555; }
     button {
       padding: 12px 24px;
       border-radius: 8px;
       border: none;
-      background: #0f3460;
-      color: #e0e0e0;
+      background: #1a3a35;
+      color: #36cfb4;
       font-size: 14px;
       cursor: pointer;
       font-family: inherit;
+      font-weight: 500;
     }
-    button:hover { background: #1a4a80; }
+    button:hover { background: #245a4a; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .welcome {
       text-align: center;
@@ -212,7 +223,13 @@
       font-size: 14px;
       line-height: 2;
     }
-    .welcome h2 { color: #888; font-size: 16px; margin-bottom: 8px; }
+    .welcome video {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+    .welcome h2 { color: #36cfb4; font-size: 18px; margin-bottom: 8px; }
     .suggestions {
       display: flex;
       flex-wrap: wrap;
@@ -223,15 +240,16 @@
     .suggestions button {
       padding: 8px 14px;
       font-size: 12px;
-      background: #222244;
-      border: 1px solid #2a2a4a;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #e0e0e0;
     }
-    .suggestions button:hover { background: #2a2a5a; }
+    .suggestions button:hover { background: #1a2a2a; border-color: #36cfb4; color: #36cfb4; }
   </style>
 </head>
 <body>
   <header>
-    <a class="back" id="back-link" href="/en/">&#8592; Ghostfolio</a>
+    <video class="logo-video" autoplay loop muted playsinline src="/api/v1/agent/video"></video>
     <h1>Agent</h1>
     <span>AI Financial Assistant</span>
     <div class="header-actions">
@@ -248,6 +266,7 @@
     <div id="chat-area">
       <div id="chat">
         <div class="welcome">
+          <video autoplay loop muted playsinline src="/api/v1/agent/video"></video>
           <h2>Ask me about your portfolio</h2>
           <div>I can analyze your holdings, look up market data, review transactions, assess risk, and estimate taxes.</div>
           <div class="suggestions">
@@ -374,6 +393,7 @@
       messages = [];
       chat.innerHTML = `
         <div class="welcome">
+          <video autoplay loop muted playsinline src="/api/v1/agent/video"></video>
           <h2>Ask me about your portfolio</h2>
           <div>I can analyze your holdings, look up market data, review transactions, assess risk, and estimate taxes.</div>
           <div class="suggestions">

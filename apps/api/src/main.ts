@@ -19,21 +19,16 @@ import helmet from 'helmet';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { LangfuseSpanProcessor } from '@langfuse/otel';
 
-// Initialize Langfuse OpenTelemetry tracing (if configured)
+// Initialize Langfuse OpenTelemetry tracing (must happen before NestJS bootstrap)
 if (process.env.LANGFUSE_SECRET_KEY) {
-  try {
-    const { NodeSDK } = require('@opentelemetry/sdk-node');
-    const { LangfuseSpanProcessor } = require('@langfuse/otel');
-
-    const sdk = new NodeSDK({
-      spanProcessors: [new LangfuseSpanProcessor()]
-    });
-    sdk.start();
-    console.log('Langfuse tracing initialized');
-  } catch (error) {
-    console.warn('Langfuse tracing not available:', error.message);
-  }
+  const sdk = new NodeSDK({
+    spanProcessors: [new LangfuseSpanProcessor()]
+  });
+  sdk.start();
+  console.log('Langfuse tracing initialized');
 }
 
 async function bootstrap() {

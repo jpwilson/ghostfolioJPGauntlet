@@ -64,6 +64,35 @@ export class AgentController {
     return res.status(404).send('Chat UI not found');
   }
 
+  @Get('video')
+  public serveVideo(@Res() res: Response) {
+    const fs = require('node:fs');
+    const path = require('node:path');
+
+    const paths = [
+      path.join(
+        process.cwd(),
+        'apps',
+        'api',
+        'src',
+        'assets',
+        'ghostfolio_squash.webm'
+      ),
+      path.join(__dirname, '..', 'assets', 'ghostfolio_squash.webm'),
+      path.join(process.cwd(), 'assets', 'ghostfolio_squash.webm')
+    ];
+
+    for (const p of paths) {
+      if (fs.existsSync(p)) {
+        res.setHeader('Content-Type', 'video/webm');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        return res.sendFile(p);
+      }
+    }
+
+    return res.status(404).send('Video not found');
+  }
+
   @Get('conversations')
   @HasPermission(permissions.createOrder)
   @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
