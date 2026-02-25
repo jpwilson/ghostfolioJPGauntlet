@@ -291,16 +291,40 @@
     /* Feedback buttons */
     .msg-feedback {
       margin-top: 6px; padding-top: 6px; border-top: 1px solid #222;
+    }
+    .msg-feedback .fb-row {
       display: flex; align-items: center; gap: 4px;
     }
-    .msg-feedback button {
+    .msg-feedback button.fb-btn {
       background: none; border: 1px solid #333; color: #666;
       padding: 2px 8px; border-radius: 4px; font-size: 12px;
       cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 3px;
     }
-    .msg-feedback button:hover { border-color: #555; color: #aaa; }
-    .msg-feedback button.liked { border-color: #36cfb4; color: #36cfb4; background: rgba(54,207,180,0.08); }
-    .msg-feedback button.disliked { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+    .msg-feedback button.fb-btn:hover { border-color: #555; color: #aaa; }
+    .msg-feedback button.fb-btn.liked { border-color: #36cfb4; color: #36cfb4; background: rgba(54,207,180,0.08); }
+    .msg-feedback button.fb-btn.disliked { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+    .msg-feedback .fb-prompt {
+      font-size: 10px; color: #555; margin-top: 4px; font-style: italic;
+    }
+    .msg-feedback .fb-explain {
+      display: none; margin-top: 6px; align-items: center; gap: 6px;
+    }
+    .msg-feedback .fb-explain.visible { display: flex; }
+    .msg-feedback .fb-explain input {
+      flex: 1; padding: 5px 10px; font-size: 11px; background: #0c0c0c;
+      border: 1px solid #333; border-radius: 5px; color: #ccc; outline: none; font-family: inherit;
+    }
+    .msg-feedback .fb-explain input:focus { border-color: #36cfb4; }
+    .msg-feedback .fb-explain input::placeholder { color: #444; }
+    .msg-feedback .fb-explain button.fb-submit {
+      background: #1a3a35; border: 1px solid #2a5a4a; color: #36cfb4;
+      padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer;
+    }
+    .msg-feedback .fb-explain button.fb-submit:hover { background: #245a4a; }
+    .msg-feedback .fb-recorded {
+      display: none; font-size: 11px; color: #36cfb4; margin-top: 6px;
+    }
+    .msg-feedback .fb-recorded.visible { display: block; }
     /* Hidden states for toggles */
     body.hide-tools .tool-calls { display: none !important; }
     body.hide-verification .verification { display: none !important; }
@@ -861,8 +885,16 @@
         fb.className = 'msg-feedback';
         const msgIdx = chat.querySelectorAll('.message.assistant').length;
         fb.innerHTML = `
-          <button onclick="feedback(this, ${msgIdx}, 'up')" title="Helpful">&#128077;</button>
-          <button onclick="feedback(this, ${msgIdx}, 'down')" title="Not helpful">&#128078;</button>
+          <div class="fb-row">
+            <button class="fb-btn" onclick="feedback(this, ${msgIdx}, 'up')" title="Helpful">&#128077;</button>
+            <button class="fb-btn" onclick="feedback(this, ${msgIdx}, 'down')" title="Not helpful">&#128078;</button>
+          </div>
+          <div class="fb-prompt">Are you happy with my response?</div>
+          <div class="fb-explain" id="fb-explain-${msgIdx}">
+            <input type="text" placeholder="Optional explanation..." onkeydown="if(event.key==='Enter')submitFeedback(${msgIdx})" />
+            <button class="fb-submit" onclick="submitFeedback(${msgIdx})">&#8592; Submit</button>
+          </div>
+          <div class="fb-recorded" id="fb-recorded-${msgIdx}">Your response has been recorded.</div>
         `;
         div.appendChild(fb);
       } else {
@@ -874,12 +906,41 @@
     }
 
     function feedback(btn, msgIdx, direction) {
-      const parent = btn.parentElement;
-      parent.querySelectorAll('button').forEach(b => { b.classList.remove('liked', 'disliked'); });
-      if (direction === 'up') btn.classList.add('liked');
-      else btn.classList.add('disliked');
-      // Could POST feedback to backend in the future
+      const fbContainer = btn.closest('.msg-feedback');
+      fbContainer.querySelectorAll('.fb-btn').forEach(b => { b.classList.remove('liked', 'disliked'); });
+      if (direction === 'up') {
+        btn.classList.add('liked');
+        // Hide explain box, show recorded
+        const explainEl = document.getElementById(`fb-explain-${msgIdx}`);
+        if (explainEl) explainEl.classList.remove('visible');
+        const recordedEl = document.getElementById(`fb-recorded-${msgIdx}`);
+        if (recordedEl) {
+          recordedEl.classList.add('visible');
+          setTimeout(() => recordedEl.classList.remove('visible'), 2000);
+        }
+      } else {
+        btn.classList.add('disliked');
+        // Show the explain input
+        const explainEl = document.getElementById(`fb-explain-${msgIdx}`);
+        if (explainEl) {
+          explainEl.classList.add('visible');
+          explainEl.querySelector('input').focus();
+        }
+      }
       console.log(`Feedback: message ${msgIdx} = ${direction}`);
+    }
+
+    function submitFeedback(msgIdx) {
+      const explainEl = document.getElementById(`fb-explain-${msgIdx}`);
+      const explanation = explainEl ? explainEl.querySelector('input').value : '';
+      console.log(`Feedback explanation for message ${msgIdx}: ${explanation}`);
+      // Hide explain, show recorded
+      if (explainEl) explainEl.classList.remove('visible');
+      const recordedEl = document.getElementById(`fb-recorded-${msgIdx}`);
+      if (recordedEl) {
+        recordedEl.classList.add('visible');
+        setTimeout(() => recordedEl.classList.remove('visible'), 2000);
+      }
     }
 
     // Admin Panel
