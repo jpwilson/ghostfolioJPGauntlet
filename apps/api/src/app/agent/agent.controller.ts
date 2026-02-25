@@ -6,10 +6,12 @@ import type { RequestWithUser } from '@ghostfolio/common/types';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Inject,
+  Param,
   Post,
   Res,
   UseGuards
@@ -18,11 +20,11 @@ import { REQUEST } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { CoreMessage } from 'ai';
 import { Response } from 'express';
-import { join } from 'node:path';
 
 import { AgentService } from './agent.service';
 
 interface ChatRequestBody {
+  conversationId?: string;
   messages: CoreMessage[];
 }
 
@@ -40,7 +42,15 @@ export class AgentController {
 
     // Try source path first (dev), then dist path
     const paths = [
-      path.join(process.cwd(), 'apps', 'api', 'src', 'app', 'agent', 'agent-chat.html'),
+      path.join(
+        process.cwd(),
+        'apps',
+        'api',
+        'src',
+        'app',
+        'agent',
+        'agent-chat.html'
+      ),
       path.join(__dirname, 'agent-chat.html')
     ];
 
@@ -51,6 +61,35 @@ export class AgentController {
     }
 
     return res.status(404).send('Chat UI not found');
+  }
+
+  @Get('conversations')
+  @HasPermission(permissions.createOrder)
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async listConversations() {
+    return this.agentService.listConversations({
+      userId: this.request.user.id
+    });
+  }
+
+  @Get('conversations/:id')
+  @HasPermission(permissions.createOrder)
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async getConversation(@Param('id') id: string) {
+    return this.agentService.getConversation({
+      conversationId: id,
+      userId: this.request.user.id
+    });
+  }
+
+  @Delete('conversations/:id')
+  @HasPermission(permissions.createOrder)
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async deleteConversation(@Param('id') id: string) {
+    return this.agentService.deleteConversation({
+      conversationId: id,
+      userId: this.request.user.id
+    });
   }
 
   @Post('chat')
@@ -66,6 +105,7 @@ export class AgentController {
 
     try {
       const result = await this.agentService.chat({
+        conversationId: body.conversationId,
         messages: body.messages,
         userId: this.request.user.id
       });

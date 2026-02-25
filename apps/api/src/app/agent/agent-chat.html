@@ -34,8 +34,23 @@
     header a.back:hover { background: #222244; }
     header h1 { font-size: 18px; font-weight: 600; }
     header span { font-size: 12px; color: #888; }
-    .status {
+    .header-actions {
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-actions button {
+      padding: 6px 14px;
+      font-size: 12px;
+      background: #222244;
+      border: 1px solid #2a2a4a;
+      color: #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .header-actions button:hover { background: #2a2a5a; }
+    .status {
       font-size: 12px;
       color: #4ade80;
       display: flex;
@@ -52,6 +67,42 @@
     }
     .status.disconnected { color: #f87171; }
     .status.disconnected::before { background: #f87171; }
+    .main-content { display: flex; flex: 1; overflow: hidden; }
+    #sidebar {
+      width: 260px;
+      background: #16213e;
+      border-right: 1px solid #2a2a4a;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    #sidebar h3 {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #888;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    .conv-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #1a1a2e;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .conv-item:hover { background: #222244; }
+    .conv-item.active { background: #0f3460; }
+    .conv-item .conv-date { font-size: 10px; color: #666; margin-top: 2px; }
+    .conv-item .conv-delete {
+      float: right;
+      color: #666;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .conv-item .conv-delete:hover { background: #3b1111; color: #f87171; }
+    #chat-area { flex: 1; display: flex; flex-direction: column; }
     #chat {
       flex: 1;
       overflow-y: auto;
@@ -93,6 +144,14 @@
       font-family: monospace;
       color: #a78bfa;
     }
+    .verification {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid #333;
+      font-size: 11px;
+    }
+    .verification.pass { color: #4ade80; }
+    .verification.fail { color: #f87171; }
     .message.error {
       align-self: center;
       background: #3b1111;
@@ -172,66 +231,163 @@
 </head>
 <body>
   <header>
-    <a class="back" id="back-link" href="/en/">← Ghostfolio</a>
+    <a class="back" id="back-link" href="/en/">&#8592; Ghostfolio</a>
     <h1>Agent</h1>
     <span>AI Financial Assistant</span>
-    <div class="status" id="status">Connected</div>
+    <div class="header-actions">
+      <button onclick="newConversation()">+ New Chat</button>
+      <div class="status" id="status">Connected</div>
+    </div>
   </header>
 
-  <div id="chat">
-    <div class="welcome">
-      <h2>Ask me about your portfolio</h2>
-      <div>I can analyze your holdings, look up market data, and review your transactions.</div>
-      <div class="suggestions">
-        <button onclick="sendSuggestion(this.textContent)">What does my portfolio look like?</button>
-        <button onclick="sendSuggestion(this.textContent)">What have I bought recently?</button>
-        <button onclick="sendSuggestion(this.textContent)">Am I diversified enough?</button>
-        <button onclick="sendSuggestion(this.textContent)">What's my biggest holding?</button>
-        <button onclick="sendSuggestion(this.textContent)">How much cash do I have?</button>
-        <button onclick="sendSuggestion(this.textContent)">Am I too heavy in tech stocks?</button>
+  <div class="main-content">
+    <div id="sidebar">
+      <h3>Conversations</h3>
+      <div id="conv-list"></div>
+    </div>
+    <div id="chat-area">
+      <div id="chat">
+        <div class="welcome">
+          <h2>Ask me about your portfolio</h2>
+          <div>I can analyze your holdings, look up market data, review transactions, assess risk, and estimate taxes.</div>
+          <div class="suggestions">
+            <button onclick="sendSuggestion(this.textContent)">What does my portfolio look like?</button>
+            <button onclick="sendSuggestion(this.textContent)">What have I bought recently?</button>
+            <button onclick="sendSuggestion(this.textContent)">How risky is my portfolio?</button>
+            <button onclick="sendSuggestion(this.textContent)">What are my unrealized gains?</button>
+            <button onclick="sendSuggestion(this.textContent)">Am I too heavy in tech stocks?</button>
+            <button onclick="sendSuggestion(this.textContent)">What's my estimated tax bill?</button>
+          </div>
+        </div>
+      </div>
+      <div id="input-area">
+        <input id="input" type="text" placeholder="Ask about your portfolio..." autofocus />
+        <button id="send" onclick="send()">Send</button>
       </div>
     </div>
   </div>
 
-  <div id="input-area">
-    <input id="input" type="text" placeholder="Ask about your portfolio..." autofocus />
-    <button id="send" onclick="send()">Send</button>
-  </div>
-
   <script>
-    // Use relative URL so it works from any origin (port 4200 proxy or 3333 direct)
-    const API = '/api/v1/agent/chat';
+    const API_BASE = '/api/v1/agent';
 
-    // Auto-detect auth token from Ghostfolio's storage
     function getToken() {
-      // Ghostfolio stores JWT as 'auth-token' in sessionStorage and localStorage
       return sessionStorage.getItem('auth-token')
         || localStorage.getItem('auth-token')
         || '';
     }
 
     let TOKEN = getToken();
-    const messages = [];
+    let messages = [];
+    let currentConversationId = null;
 
     const statusEl = document.getElementById('status');
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const convListEl = document.getElementById('conv-list');
 
     if (!TOKEN) {
       statusEl.textContent = 'Not authenticated';
       statusEl.className = 'status disconnected';
-
       const t = prompt('No auth token found. Please sign into Ghostfolio first, then reload this page.\n\nOr paste your JWT token here:');
-      if (t) {
-        TOKEN = t;
-      }
+      if (t) TOKEN = t;
     }
-
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('input');
-    const sendBtn = document.getElementById('send');
 
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
+
+    // Load conversations on startup
+    loadConversations();
+
+    async function loadConversations() {
+      if (!TOKEN) return;
+      try {
+        const res = await fetch(`${API_BASE}/conversations`, {
+          headers: { 'Authorization': `Bearer ${TOKEN}` }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        renderConversationList(data.conversations || []);
+      } catch (e) { /* ignore */ }
+    }
+
+    function renderConversationList(conversations) {
+      convListEl.innerHTML = '';
+      for (const conv of conversations) {
+        const div = document.createElement('div');
+        div.className = 'conv-item' + (conv.id === currentConversationId ? ' active' : '');
+        const dateStr = new Date(conv.updatedAt).toLocaleDateString();
+        div.innerHTML = `
+          <span class="conv-delete" onclick="event.stopPropagation(); deleteConversation('${conv.id}')">&#10005;</span>
+          <div>${conv.title || 'Untitled'}</div>
+          <div class="conv-date">${dateStr} &middot; ${conv._count?.messages || 0} msgs</div>
+        `;
+        div.addEventListener('click', () => loadConversation(conv.id));
+        convListEl.appendChild(div);
+      }
+    }
+
+    async function loadConversation(id) {
+      if (!TOKEN) return;
+      try {
+        const res = await fetch(`${API_BASE}/conversations/${id}`, {
+          headers: { 'Authorization': `Bearer ${TOKEN}` }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.conversation) return;
+
+        currentConversationId = id;
+        messages = [];
+        chat.innerHTML = '';
+
+        for (const msg of data.conversation.messages) {
+          messages.push({ role: msg.role, content: msg.content });
+          addMessage(msg.content, msg.role, msg.toolCalls);
+        }
+
+        // Update active state in sidebar
+        document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.conv-item').forEach(el => {
+          if (el.querySelector('.conv-delete')?.getAttribute('onclick')?.includes(id)) {
+            el.classList.add('active');
+          }
+        });
+      } catch (e) { /* ignore */ }
+    }
+
+    async function deleteConversation(id) {
+      if (!confirm('Delete this conversation?')) return;
+      try {
+        await fetch(`${API_BASE}/conversations/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${TOKEN}` }
+        });
+        if (id === currentConversationId) newConversation();
+        loadConversations();
+      } catch (e) { /* ignore */ }
+    }
+
+    function newConversation() {
+      currentConversationId = null;
+      messages = [];
+      chat.innerHTML = `
+        <div class="welcome">
+          <h2>Ask me about your portfolio</h2>
+          <div>I can analyze your holdings, look up market data, review transactions, assess risk, and estimate taxes.</div>
+          <div class="suggestions">
+            <button onclick="sendSuggestion(this.textContent)">What does my portfolio look like?</button>
+            <button onclick="sendSuggestion(this.textContent)">What have I bought recently?</button>
+            <button onclick="sendSuggestion(this.textContent)">How risky is my portfolio?</button>
+            <button onclick="sendSuggestion(this.textContent)">What are my unrealized gains?</button>
+            <button onclick="sendSuggestion(this.textContent)">Am I too heavy in tech stocks?</button>
+            <button onclick="sendSuggestion(this.textContent)">What's my estimated tax bill?</button>
+          </div>
+        </div>
+      `;
+      document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+    }
 
     function sendSuggestion(text) {
       input.value = text;
@@ -242,7 +398,6 @@
       const text = input.value.trim();
       if (!text) return;
 
-      // Re-check token in case user logged in
       if (!TOKEN) TOKEN = getToken();
       if (!TOKEN) {
         addMessage('Please sign into Ghostfolio first, then reload this page.', 'error');
@@ -264,13 +419,16 @@
       chat.scrollTop = chat.scrollHeight;
 
       try {
-        const res = await fetch(API, {
+        const res = await fetch(`${API_BASE}/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${TOKEN}`
           },
-          body: JSON.stringify({ messages })
+          body: JSON.stringify({
+            messages,
+            conversationId: currentConversationId
+          })
         });
 
         typing.remove();
@@ -283,8 +441,15 @@
         }
 
         const data = await res.json();
+
+        // Track conversation ID for subsequent messages
+        if (data.conversationId) {
+          currentConversationId = data.conversationId;
+          loadConversations();
+        }
+
         messages.push({ role: 'assistant', content: data.message });
-        addMessage(data.message, 'assistant', data.toolCalls);
+        addMessage(data.message, 'assistant', data.toolCalls, data.verification);
 
       } catch (err) {
         typing.remove();
@@ -295,7 +460,7 @@
       input.focus();
     }
 
-    function addMessage(text, role, toolCalls) {
+    function addMessage(text, role, toolCalls, verification) {
       const div = document.createElement('div');
       div.className = `message ${role}`;
       div.textContent = text;
@@ -305,6 +470,14 @@
         tc.className = 'tool-calls';
         tc.innerHTML = 'Tools used: ' + toolCalls.map(t => `<span>${t.tool}</span>`).join('');
         div.appendChild(tc);
+      }
+
+      if (verification && verification.checks?.length > 0) {
+        const vDiv = document.createElement('div');
+        vDiv.className = `verification ${verification.verified ? 'pass' : 'fail'}`;
+        const icon = verification.verified ? '&#10003;' : '&#9888;';
+        vDiv.innerHTML = `${icon} Verified: ${verification.checks.map(c => `${c.passed ? '&#10003;' : '&#10007;'} ${c.check}`).join(', ')}`;
+        div.appendChild(vDiv);
       }
 
       chat.appendChild(div);
