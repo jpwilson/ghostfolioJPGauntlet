@@ -39,6 +39,9 @@ COPY prisma /ghostfolio/dist/apps/api/prisma/
 COPY package.json /ghostfolio/dist/apps/api/
 RUN npm run database:generate-typings
 
+# Copy agent chat HTML to dist
+RUN cp /ghostfolio/apps/api/src/app/agent/agent-chat.html /ghostfolio/dist/apps/api/ 2>/dev/null || true
+
 # Runtime image
 FROM node:22-slim
 ENV NODE_ENV=production

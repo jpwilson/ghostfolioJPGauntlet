@@ -40,7 +40,7 @@ export class AgentController {
     const fs = require('node:fs');
     const path = require('node:path');
 
-    // Try source path first (dev), then dist path
+    // Try source path first (dev), then dist paths
     const paths = [
       path.join(
         process.cwd(),
@@ -51,7 +51,8 @@ export class AgentController {
         'agent',
         'agent-chat.html'
       ),
-      path.join(__dirname, 'agent-chat.html')
+      path.join(__dirname, 'agent-chat.html'),
+      path.join(process.cwd(), 'agent-chat.html')
     ];
 
     for (const p of paths) {
