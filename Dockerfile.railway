@@ -34,6 +34,7 @@ RUN npm run build:production
 WORKDIR /ghostfolio/dist/apps/api
 COPY ./package-lock.json /ghostfolio/dist/apps/api/
 RUN npm install
+RUN npm install @langfuse/otel @opentelemetry/sdk-node --save 2>/dev/null || true
 COPY .config /ghostfolio/dist/apps/api/.config/
 COPY prisma /ghostfolio/dist/apps/api/prisma/
 COPY package.json /ghostfolio/dist/apps/api/
