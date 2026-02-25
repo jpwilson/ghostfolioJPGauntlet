@@ -544,7 +544,15 @@ If you detect any inconsistencies in the data, flag them clearly to the user.`,
           }
         })
       },
-      maxSteps: 5
+      maxSteps: 5,
+      experimental_telemetry: {
+        isEnabled: true,
+        functionId: 'ghostfolio-agent',
+        metadata: {
+          userId,
+          conversationId: convId
+        }
+      }
     });
 
     // --- Verification Layer ---

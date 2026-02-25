@@ -20,6 +20,22 @@ import helmet from 'helmet';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 
+// Initialize Langfuse OpenTelemetry tracing (if configured)
+if (process.env.LANGFUSE_SECRET_KEY) {
+  try {
+    const { NodeSDK } = require('@opentelemetry/sdk-node');
+    const { LangfuseSpanProcessor } = require('@langfuse/otel');
+
+    const sdk = new NodeSDK({
+      spanProcessors: [new LangfuseSpanProcessor()]
+    });
+    sdk.start();
+    console.log('Langfuse tracing initialized');
+  } catch (error) {
+    console.warn('Langfuse tracing not available:', error.message);
+  }
+}
+
 async function bootstrap() {
   const configApp = await NestFactory.create(AppModule);
   const configService = configApp.get<ConfigService>(ConfigService);
