@@ -48,7 +48,7 @@ export const ASSET_CLASS_MAPPING = new Map<AssetClass, AssetSubClass[]>([
   ],
   [AssetClass.FIXED_INCOME, [AssetSubClass.BOND]],
   [AssetClass.LIQUIDITY, [AssetSubClass.CRYPTOCURRENCY]],
-  [AssetClass.REAL_ESTATE, []]
+  [AssetClass.REAL_ESTATE, [AssetSubClass.RENTAL_PROPERTY, AssetSubClass.COMMERCIAL_PROPERTY, AssetSubClass.SMALL_BUSINESS]]
 ]);
 
 export const CACHE_TTL_NO_CACHE = 1;

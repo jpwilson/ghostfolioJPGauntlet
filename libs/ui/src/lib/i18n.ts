@@ -57,8 +57,11 @@ const locales = {
   CRYPTOCURRENCY: $localize`Cryptocurrency`,
   ETF: $localize`ETF`,
   MUTUALFUND: $localize`Mutual Fund`,
+  COMMERCIAL_PROPERTY: $localize`Commercial Property`,
   PRECIOUS_METAL: $localize`Precious Metal`,
   PRIVATE_EQUITY: $localize`Private Equity`,
+  RENTAL_PROPERTY: $localize`Rental Property`,
+  SMALL_BUSINESS: $localize`Small Business`,
   STOCK: $localize`Stock`,
 
   // Benchmark
